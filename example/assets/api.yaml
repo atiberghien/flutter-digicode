@@ -1,0 +1,4 @@
+base_url : "http://192.168.0.137:8000/api/"
+get-jwt-token: 'token/' 
+get-api-key: 'get-key/'
+revoke-api-key : 'revoke-key/'
