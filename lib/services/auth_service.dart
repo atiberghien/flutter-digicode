@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yaml/yaml.dart';
 import 'package:http/http.dart' as http;
 import 'package:digicode/models/user.dart';
@@ -23,11 +24,16 @@ class AuthService extends ChangeNotifier {
     });
   }
 
-  Map<String, String> _buildHeaders({String? accessToken, String? apiKey}) {
+  static Future<Map<String, String>> buildHeaders() async {
     Map<String, String> headers = {
       "Accept": "application/json",
       "Content-Type": "application/json",
     };
+    final prefs = await SharedPreferences.getInstance();
+
+    final accessToken = prefs.getString('token');
+    final apiKey = prefs.getString('apiKey');
+
     if (accessToken != null) {
       headers['Authorization'] = 'Bearer $accessToken';
     } else if (apiKey != null) {
@@ -66,6 +72,8 @@ class AuthService extends ChangeNotifier {
     var res = await db!.rawQuery("SELECT * FROM user ORDER BY id DESC");
     if (res.isNotEmpty) {
       var user = User.fromDb(res.first);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('apiKey', user.apiKey);
       return user;
     }
     return null;
@@ -75,7 +83,7 @@ class AuthService extends ChangeNotifier {
     final db = await getDb();
     var response = await http.post(
       Uri.parse(join(config['base_url'], config['get-jwt-token'])),
-      headers: _buildHeaders(),
+      headers: await buildHeaders(),
       body: jsonEncode(
         {
           'username': email,
@@ -86,9 +94,11 @@ class AuthService extends ChangeNotifier {
     if (response.statusCode == 200) {
       var json = jsonDecode(response.body);
       final token = json['access'];
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', token);
       response = await http.get(
         Uri.parse(join(config['base_url'], config['get-api-key'])),
-        headers: _buildHeaders(accessToken: token),
+        headers: await buildHeaders(),
       );
       json = jsonDecode(response.body);
 
@@ -115,7 +125,7 @@ class AuthService extends ChangeNotifier {
     getUser().then((user) async {
       var response = await http.post(
         Uri.parse(join(config['base_url'], config['revoke-api-key'])),
-        headers: _buildHeaders(apiKey: user!.apiKey),
+        headers: await buildHeaders(),
       );
       await db!.delete("user");
       if (response.statusCode != 200) {

@@ -2,8 +2,8 @@ class User {
   int id;
   String username;
   int? code;
-  String? apiKey;
-  DateTime? lastLogin;
+  String apiKey;
+  DateTime lastLogin;
 
   User({
     required this.id,
@@ -25,7 +25,7 @@ class User {
       'username': username,
       'code': code,
       'api_key': apiKey,
-      'last_login': lastLogin!.toIso8601String(),
+      'last_login': lastLogin.toIso8601String(),
     };
   }
 }
