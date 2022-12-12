@@ -34,10 +34,10 @@ class AuthService extends ChangeNotifier {
     final accessToken = prefs.getString('token');
     final apiKey = prefs.getString('apiKey');
 
-    if (accessToken != null) {
-      headers['Authorization'] = 'Bearer $accessToken';
-    } else if (apiKey != null) {
+    if (apiKey != null) {
       headers['Authorization'] = 'Api-Key $apiKey';
+    } else if (accessToken != null) {
+      headers['Authorization'] = 'Bearer $accessToken';
     }
     return headers;
   }
