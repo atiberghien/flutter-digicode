@@ -79,7 +79,13 @@ class AuthService extends ChangeNotifier {
     return null;
   }
 
+  clearSharedPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+  }
+
   connect(email, password, code) async {
+    clearSharedPrefs();
     final db = await getDb();
     var response = await http.post(
       Uri.parse(join(config['base_url'], config['get-jwt-token'])),
@@ -121,6 +127,7 @@ class AuthService extends ChangeNotifier {
   }
 
   disconnect() async {
+    clearSharedPrefs();
     final db = await getDb();
     getUser().then((user) async {
       var response = await http.post(
