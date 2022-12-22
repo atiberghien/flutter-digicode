@@ -87,7 +87,7 @@ class _PassCodeScreenState extends ConsumerState<PassCodeScreen> {
                 height: 20,
                 margin: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                  color: index < digits.length ? Colors.lightGreen[400] : Colors.black12,
+                  color: index < digits.length ? Color(0xFF4d8781) : Colors.black12,
                   borderRadius: BorderRadius.circular(10),
                 ),
               );
@@ -114,6 +114,7 @@ class _PassCodeScreenState extends ConsumerState<PassCodeScreen> {
                                 if (digits.length == 4) {
                                   if (int.parse(digits) == widget.user.code) {
                                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                      backgroundColor: Colors.green,
                                       content: Text('Code correct'),
                                       duration: Duration(seconds: 2),
                                     ));
@@ -124,6 +125,7 @@ class _PassCodeScreenState extends ConsumerState<PassCodeScreen> {
                                     });
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                      backgroundColor: Colors.red,
                                       content: Text('Code incorrect'),
                                       duration: Duration(seconds: 2),
                                     ));
