@@ -47,14 +47,22 @@ class AuthService extends ChangeNotifier {
     return _db;
   }
 
+  final List<String> v2DbInstructions = ["ALTER TABLE user ADD COLUMN first_name VARCHAR(255) DEFAULT ''", "ALTER TABLE user ADD COLUMN last_name VARCHAR(255) DEFAULT ''"];
+
   Future<Database> _initDb() async {
+    print("INIT USER DB");
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, "auth.db");
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
+      onOpen: (Database db) async {
+        print('USER DB VERSION v${await db.getVersion()}');
+      },
       onCreate: (Database db, int version) async {
-        await db.execute('''
+        print("CREATE USER DB v$version");
+        var batch = db.batch();
+        batch.execute('''
           CREATE TABLE user (
             id INTEGER PRIMARY KEY,
             username TEXT NOT NULL,
@@ -63,11 +71,28 @@ class AuthService extends ChangeNotifier {
             last_login DATETIME
           )
           ''');
+        if (version == 2) {
+          v2DbInstructions.forEach((instruction) {
+            batch.execute(instruction);
+          });
+        }
+        await batch.commit();
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        print("UPGRADE USER DB FROM v$oldVersion TO v$newVersion");
+        var batch = db.batch();
+        if (oldVersion == 1) {
+          print("UPGRADE USER DB from v$oldVersion to v$newVersion");
+          v2DbInstructions.forEach((instruction) {
+            batch.execute(instruction);
+          });
+        }
+        await batch.commit();
       },
     );
   }
 
-  Future<User?> getUser() async {
+  Future<User> getUser() async {
     final db = await getDb();
     var res = await db!.rawQuery("SELECT * FROM user ORDER BY id DESC");
     if (res.isNotEmpty) {
@@ -76,7 +101,7 @@ class AuthService extends ChangeNotifier {
       await prefs.setString('apiKey', user.apiKey);
       return user;
     }
-    return null;
+    return User.anonymous();
   }
 
   clearSharedPrefs() async {
@@ -97,6 +122,7 @@ class AuthService extends ChangeNotifier {
         },
       ),
     );
+
     if (response.statusCode == 200) {
       var json = jsonDecode(response.body);
       final token = json['access'];
@@ -111,6 +137,8 @@ class AuthService extends ChangeNotifier {
       final user = User(
         id: 0,
         username: email,
+        firstName: '',
+        lastName: '',
         code: int.parse(code),
         apiKey: json['apiKey'],
         lastLogin: DateTime.now(),
@@ -127,13 +155,13 @@ class AuthService extends ChangeNotifier {
   }
 
   disconnect() async {
-    clearSharedPrefs();
     final db = await getDb();
     getUser().then((user) async {
       var response = await http.post(
         Uri.parse(join(config['base_url'], config['revoke-api-key'])),
         headers: await buildHeaders(),
       );
+      clearSharedPrefs();
       await db!.delete("user");
       if (response.statusCode != 200) {
         throw Exception(response.reasonPhrase);

@@ -42,6 +42,7 @@ class MyApp extends StatelessWidget {
         body: AuthGuard(
           logo: FlutterLogo(size: 400),
           target: Home(),
+          color: Colors.pink,
         ),
       ),
     );
