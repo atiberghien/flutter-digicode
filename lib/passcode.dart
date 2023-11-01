@@ -51,7 +51,7 @@ class _PassCodeScreenState extends ConsumerState<PassCodeScreen> {
       children: [
         const SizedBox(height: 20),
         Container(
-          width: 350,
+          width: 500,
           padding: const EdgeInsets.fromLTRB(20, 5, 2, 5),
           decoration: BoxDecoration(
             color: Colors.black12,

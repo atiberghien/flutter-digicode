@@ -20,8 +20,10 @@ class ConnectionScreenState extends ConsumerState<ConnectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const formWidth = 500.0;
+
     return Container(
-      width: double.infinity,
+      // width: double.infinity,
       child: Form(
         key: _formKey,
         child: Padding(
@@ -29,115 +31,128 @@ class ConnectionScreenState extends ConsumerState<ConnectionScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 30),
-              TextFormField(
-                controller: _username,
-                decoration: const InputDecoration(
-                  prefixIcon: Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: FaIcon(FontAwesomeIcons.solidUser),
+              SizedBox(
+                width: formWidth,
+                child: TextFormField(
+                  controller: _username,
+                  decoration: const InputDecoration(
+                    prefixIcon: Padding(
+                      padding: EdgeInsets.all(10.0),
+                      child: FaIcon(FontAwesomeIcons.solidUser),
+                    ),
+                    labelText: 'Identifiant',
                   ),
-                  labelText: 'Identifiant',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Champs obligatoire';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Champs obligatoire';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 30),
-              TextFormField(
-                controller: _password,
-                decoration: const InputDecoration(
-                  prefixIcon: Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: FaIcon(FontAwesomeIcons.lock),
+              SizedBox(
+                width: formWidth,
+                child: TextFormField(
+                  controller: _password,
+                  decoration: const InputDecoration(
+                    prefixIcon: Padding(
+                      padding: EdgeInsets.all(10.0),
+                      child: FaIcon(FontAwesomeIcons.lock),
+                    ),
+                    labelText: 'Mot de passe',
                   ),
-                  labelText: 'Mot de passe',
+                  obscureText: true,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Champs obligatoire';
+                    }
+                    return null;
+                  },
                 ),
-                obscureText: true,
-                enableSuggestions: false,
-                autocorrect: false,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Champs obligatoire';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 30),
-              TextFormField(
-                controller: _code,
-                decoration: const InputDecoration(
-                  prefixIcon: Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: FaIcon(FontAwesomeIcons.key),
+              SizedBox(
+                width: formWidth,
+                child: TextFormField(
+                  controller: _code,
+                  decoration: const InputDecoration(
+                    prefixIcon: Padding(
+                      padding: EdgeInsets.all(10.0),
+                      child: FaIcon(FontAwesomeIcons.key),
+                    ),
+                    labelText: 'Code personnel',
                   ),
-                  labelText: 'Code personnel',
+                  obscureText: true,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(4),
+                  ],
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Champs obligatoire';
+                    }
+                    return null;
+                  },
                 ),
-                obscureText: true,
-                enableSuggestions: false,
-                autocorrect: false,
-                keyboardType: TextInputType.number,
-                inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(4),
-                ],
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Champs obligatoire';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 30),
-              TextFormField(
-                controller: _confirmCode,
-                decoration: const InputDecoration(
-                  labelText: 'Confirmation code personnel',
-                  prefixIcon: Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: FaIcon(FontAwesomeIcons.key),
+              SizedBox(
+                width: formWidth,
+                child: TextFormField(
+                  controller: _confirmCode,
+                  decoration: const InputDecoration(
+                    labelText: 'Confirmation code personnel',
+                    prefixIcon: Padding(
+                      padding: EdgeInsets.all(10.0),
+                      child: FaIcon(FontAwesomeIcons.key),
+                    ),
                   ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(4),
+                  ],
+                  obscureText: true,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Champs obligatoire';
+                    }
+                    if (value != _code.text) {
+                      return 'Les codes ne correspondent pas';
+                    }
+                    return null;
+                  },
                 ),
-                keyboardType: TextInputType.number,
-                inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(4),
-                ],
-                obscureText: true,
-                enableSuggestions: false,
-                autocorrect: false,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Champs obligatoire';
-                  }
-                  if (value != _code.text) {
-                    return 'Les codes ne correspondent pas';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 35),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(50),
-                ),
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // ScaffoldMessenger.of(context).showSnackBar(
-                    //   const SnackBar(content: Text('FORM VALID')),
-                    // );
-                    ref.read(authProvider).connect(_username.text, _password.text, _code.text);
-                  }
-                },
-                child: const Text(
-                  "Connexion",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+              SizedBox(
+                width: formWidth,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
+                  ),
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      ref.read(authProvider).connect(_username.text, _password.text, _code.text);
+                    }
+                  },
+                  child: const Text(
+                    "Connexion",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               )

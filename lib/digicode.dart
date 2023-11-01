@@ -51,10 +51,13 @@ class _AuthGuardState extends ConsumerState<AuthGuard> {
                     children: _children(),
                   ),
                 )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: _children(),
-                ),
+              : Padding(
+                padding: const EdgeInsets.only(top:100.0),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: _children(),
+                  ),
+              ),
         );
       },
     );

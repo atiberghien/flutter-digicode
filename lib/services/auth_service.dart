@@ -163,9 +163,9 @@ class AuthService extends ChangeNotifier {
       );
       clearSharedPrefs();
       await db!.delete("user");
-      if (response.statusCode != 200) {
-        throw Exception(response.reasonPhrase);
-      }
+      // if (response.statusCode != 200) {
+      //   throw Exception(response.reasonPhrase);
+      // }
       notifyListeners();
     });
   }
